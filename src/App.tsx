@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import Header from './Header';
@@ -15,7 +15,7 @@ export default function App() {
 
   return (
     <Box sx={{ display: 'flex' }}>
-      
+      <Header />
       <Toc onMovieClick={handleMovieClick} />
       <Content selectedMovie={selectedMovie} />
     </Box>
