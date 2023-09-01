@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 
-import { ListItem, ListItemButton, Skeleton, Typography } from '@mui/material';
-import { fetchCharacterData ,fetchPlanetData, fetchSpeciesData, fetchStarshipsData, fetchVehicleData } from './api/data';
+import AddIcon from '@mui/icons-material/Add';
+
+import { Fab, ListItem, ListItemButton, Skeleton, Typography } from '@mui/material';
+import { fetchAllSpeciesData,  fetchAllVehicleData , fetchAllCharacterData,fetchAllPlanetData,fetchAllStarshipsData} from './api/data';
 import  BasicModal from './ModalProps';
 
 
@@ -14,81 +16,127 @@ interface ContentProps {
 }
 export default function ClippedDrawer(props: ContentProps) {
   
+
+  const [vehiclesData, setVehiclesData] = useState<Vehicles[]>([]);
   const [characterData, setCharacterData] = useState<People[]>([]);
   const [planetData, setPlanetData] = useState<Planet[]>([]);
   const [starshipsData, setStarshipsData] = useState<Starships[]>([]);
-  const [vehiclesData, setVehiclesData] = useState<Vehicles[]>([]);
   const [speciesData, setSpeciesData] = useState<Species[]>([]);
- 
+  
   const [isLoading, setIsLoading] = useState(true);
-
   const [selectedCharacter, setSelectedCharacter] = useState<People | null>(null);
   const [selectedPlanet, setSelectedPlanet] = useState<Planet | null>(null);
   const [selectedStarships, setSelectedStarships] = useState<Starships | null>(null);
   const [selectedVehicles, setSelectedVehicles] = useState<Vehicles | null>(null);
   const [selectedSpecies, setSelectedSpecies] = useState<Species | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<'people' | 'planets' | 'starships' | 'species' | 'vehicles'>();
 
-  const [isModalOpen, setIsModalOpen] = useState<'people' | 'planets' | 'starships' | 'species'| 'vehicles'>();
+  const [isPressed, setIsPressed] = useState(false);
+  const handleButtonClick = () => {
+    // Toggle the state when the button is clicked
+    setIsPressed(!isPressed);
+  };
+
+  React.useEffect(() => {
+    const cachedVehicles = localStorage.getItem('vehicles');
+    const cachedSpecies = localStorage.getItem('species');
+    const cachedCharacters = localStorage.getItem('characters');
+    const cachedPlanets = localStorage.getItem('planets');
+    const cachedStarships = localStorage.getItem('starships');
+  
+    if (cachedVehicles && cachedSpecies && cachedCharacters && cachedPlanets && cachedStarships) {
+      setIsLoading(false);
+    } else {
+      Promise.all([
+        fetchAllVehicleData(),
+        fetchAllSpeciesData(),
+        fetchAllCharacterData(),
+        fetchAllPlanetData(),
+        fetchAllStarshipsData(),
+      ])
+        .then(([vehiclesData, speciesData, charactersData, planetsData, starshipsData]) => {
+          setVehiclesData(vehiclesData);
+          setSpeciesData(speciesData);
+          setCharacterData(charactersData);
+          setPlanetData(planetsData);
+          setStarshipsData(starshipsData);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.error('Error fetching data:', error);
+          setIsLoading(false);
+        });
+    }
+  }, []);
 
   useEffect(() => {
-    setIsLoading(true);
-
     if (props.selectedMovie) {
-      const cachedCharacterData = localStorage.getItem(`${props.selectedMovie.url}_characters`);
-      const cachedPlanetData = localStorage.getItem(`${props.selectedMovie.url}_planets`);
-      const cachedStarshipsData = localStorage.getItem(`${props.selectedMovie.url}_starships`);
-      const cachedvehiclesData = localStorage.getItem(`${props.selectedMovie.url}_vehicles`);
-      const cachedspeciesData = localStorage.getItem(`${props.selectedMovie.url}_species`);
+      setIsLoading(true);
+      const veichlesdata = JSON.parse(localStorage.getItem("vehicles") || '{}')
+      const speciesdata = JSON.parse(localStorage.getItem("species") || '{}')
+      const characterdata = JSON.parse(localStorage.getItem("characters") || '[]');
+      const planetdata = JSON.parse(localStorage.getItem("planets") || '{}')
+      const starshipsdata = JSON.parse(localStorage.getItem("starships") || '{}')
 
 
-      if (cachedCharacterData) {
-        setCharacterData(JSON.parse(cachedCharacterData));
+      const matchingVehicles = props.selectedMovie?.vehicles.filter((selectedVehicleUrl) => {
+        return veichlesdata.some((vehicleData : Vehicles) => vehicleData.url === selectedVehicleUrl);
+      });
+      const selectedVeichelsData = veichlesdata.filter((vehicleData: Vehicles) => {
+        return matchingVehicles?.includes(vehicleData.url);
+      });
+      setVehiclesData(selectedVeichelsData);
+      
+      const matchingSpecies = props.selectedMovie?.species.filter((selectedSpeciesUrl) => {
+        return speciesdata.some((speciesData : Species) => speciesData.url === selectedSpeciesUrl);
       }
-      if (cachedPlanetData) {
-        setPlanetData(JSON.parse(cachedPlanetData));
+      );
+      const selectedSpeciesData = speciesdata.filter((speciesData: Species) => {
+        return matchingSpecies?.includes(speciesData.url);
       }
-      if (cachedStarshipsData) {
-        setStarshipsData(JSON.parse(cachedStarshipsData));
-      }
-      if (cachedvehiclesData) {
-        setStarshipsData(JSON.parse(cachedvehiclesData));
-      }
-      if (cachedspeciesData) {
-        setStarshipsData(JSON.parse(cachedspeciesData));
-      }
+      );
+      setSpeciesData(selectedSpeciesData);
 
-
-      // Fetch and store data if not cached
-    if (!cachedCharacterData || !cachedPlanetData || !cachedStarshipsData || !cachedvehiclesData || !cachedspeciesData) {
-        Promise.all([
-          fetchCharacterData(props.selectedMovie.characters),
-          fetchPlanetData(props.selectedMovie.planets),
-          fetchStarshipsData(props.selectedMovie.starships),
-          fetchVehicleData(props.selectedMovie.vehicles),
-          fetchSpeciesData(props.selectedMovie.species)
-        ]).then(([characters, planets, starships,vehicles,species]) => {
-          setCharacterData(characters);
-          setPlanetData(planets);
-          setStarshipsData(starships);
-          setVehiclesData(vehicles);
-          setSpeciesData(species);
-          setIsLoading(false);
-
-          if (props.selectedMovie?.url) {
-            localStorage.setItem(`${props.selectedMovie.url}_characters`, JSON.stringify(characters));
-            localStorage.setItem(`${props.selectedMovie.url}_planets`, JSON.stringify(planets));
-            localStorage.setItem(`${props.selectedMovie.url}_starships`, JSON.stringify(starships));
-            localStorage.setItem(`${props.selectedMovie.url}_vehicles`, JSON.stringify(vehicles));
-            localStorage.setItem(`${props.selectedMovie.url}_species`, JSON.stringify(species));
-          }
-        });
-      } else {
-        setIsLoading(false);
+      const matchingCharacter = props.selectedMovie?.characters.filter((selectedCharacterUrl) => {
+        return characterdata.some((characterData : People) => characterData.url === selectedCharacterUrl);
       }
+      );
+      const selectedCharacterData = characterdata.filter((characterData: People) => {
+        return matchingCharacter?.includes(characterData.url);
+      }
+      );
+      setCharacterData(selectedCharacterData);
+
+      const matchingPlanet = props.selectedMovie?.planets.filter((selectedPlanetUrl) => {
+        return planetdata.some((planetData : Planet) => planetData.url === selectedPlanetUrl);
+      }
+      );
+
+      const selectedPlanetData = planetdata.filter((planetData: Planet) => {
+        return matchingPlanet?.includes(planetData.url);
+      }
+      );
+      setPlanetData(selectedPlanetData);
+
+      const matchingStarships = props.selectedMovie?.starships.filter((selectedStarshipsUrl) => {
+        return starshipsdata.some((starshipsData : Starships) => starshipsData.url === selectedStarshipsUrl);
+      }
+      );
+      const selectedStarshipsData = starshipsdata.filter((starshipsData: Starships) => {
+        return matchingStarships?.includes(starshipsData.url);
+      }
+      );
+
+      setStarshipsData(selectedStarshipsData);
+      
+      setIsLoading(false);
     }
-  }, [props.selectedMovie]);
 
- 
+
+ }, [props.selectedMovie]);
+
+
+  
 
   const renderFilmData = () => {
 
@@ -96,12 +144,21 @@ export default function ClippedDrawer(props: ContentProps) {
     
     const film = props.selectedMovie  
 
+    if(!isLoading && !film) {
+      data.map((item: Film) => {
+        if(item.episode_id === 4) {
+          return item
+        }
+      })
+    }
+      
+
     if (!film) {
 
       return <Skeleton variant="rectangular" width={500} height={200} />;
     }
 
-  const renderCharactersData = (data: People[] ) => {
+  const renderCharactersData = (data: People[]) => {
     if (isLoading) {
       return <Skeleton variant="rectangular" width={500} height={100} />;
     }
@@ -134,8 +191,8 @@ export default function ClippedDrawer(props: ContentProps) {
           <p>Gender: {selectedCharacter.gender}</p>
           <p>Homeworld: {selectedCharacter.homeworld}</p>
           <p>Films: {selectedCharacter.films.join(', ')}</p>
-          <p>Vehicles: {selectedCharacter.vehicles.join(', ')}</p>
-          <p>Starships: {selectedCharacter.starships.join(', ')}</p>
+          <p>Vehicles: {selectedCharacter.vehicles.length? selectedCharacter.vehicles.join(', ') : 0}</p>
+          <p>Starships: {selectedCharacter.starships.length? selectedCharacter.starships.join(', '):0}</p>
           </BasicModal>
         )}
       </>
@@ -321,6 +378,13 @@ export default function ClippedDrawer(props: ContentProps) {
         <Typography variant="h4" gutterBottom>
           {film.title}
         </Typography>
+        <Fab
+        color={isPressed ? 'secondary' : 'primary'} 
+        aria-label="add"
+        onClick={handleButtonClick}
+      >
+        <AddIcon />
+      </Fab>
         <Typography variant="subtitle1" gutterBottom>
           Episode {film.episode_id}
         </Typography>
@@ -350,7 +414,7 @@ export default function ClippedDrawer(props: ContentProps) {
         <Typography variant="h6" gutterBottom>
           Starships
           {renderStarshipsData(starshipsData)}
-        </Typography>
+        </Typography> 
         <Typography variant="h6" gutterBottom>
           Vehicles
           {renderVehiclesData(vehiclesData)}
