@@ -4,7 +4,7 @@ import Toolbar from '@mui/material/Toolbar';
 
 import AddIcon from '@mui/icons-material/Add';
 
-import { Fab, ListItem, ListItemButton, Skeleton, Typography } from '@mui/material';
+import { Button, Fab, ListItem, ListItemButton, Skeleton, Typography } from '@mui/material';
 import { fetchAllSpeciesData,  fetchAllVehicleData , fetchAllCharacterData,fetchAllPlanetData,fetchAllStarshipsData} from './api/data';
 import  BasicModal from './ModalProps';
 
@@ -29,13 +29,10 @@ export default function ClippedDrawer(props: ContentProps) {
   const [selectedStarships, setSelectedStarships] = useState<Starships | null>(null);
   const [selectedVehicles, setSelectedVehicles] = useState<Vehicles | null>(null);
   const [selectedSpecies, setSelectedSpecies] = useState<Species | null>(null);
+  
   const [isModalOpen, setIsModalOpen] = useState<'people' | 'planets' | 'starships' | 'species' | 'vehicles'>();
 
-  const [isPressed, setIsPressed] = useState(false);
-  const handleButtonClick = () => {
-    // Toggle the state when the button is clicked
-    setIsPressed(!isPressed);
-  };
+  const [favoriteFilms, setFavoriteFilms] = useState<Film[]>([]);
 
   React.useEffect(() => {
     const cachedVehicles = localStorage.getItem('vehicles');
@@ -135,8 +132,6 @@ export default function ClippedDrawer(props: ContentProps) {
 
  }, [props.selectedMovie]);
 
-
-  
 
   const renderFilmData = () => {
 
@@ -372,19 +367,46 @@ export default function ClippedDrawer(props: ContentProps) {
   };
 
 
+  function addFilmFavorite (episode_id: number) {
+    const data = JSON.parse(localStorage.getItem('films') || '{}')
+    const film = data?.find((film: Film) => film.episode_id === episode_id);
+    if (film) {
+      const favoriteFilms = JSON.parse(localStorage.getItem('favoriteFilms') || '[]');
+      if (!favoriteFilms.some((favoriteFilm: Film) => favoriteFilm.episode_id === episode_id)) {
+        favoriteFilms.push(film);
+        localStorage.setItem('favoriteFilms', JSON.stringify(favoriteFilms));
+      } else 
+      {
+        const filteredFilms = favoriteFilms.filter((favoriteFilm: Film) => favoriteFilm.episode_id !== episode_id);
+        localStorage.setItem('favoriteFilms', JSON.stringify(filteredFilms));
+
+      }
+    }
+  }
+
+  const renderAddFavoriteButton = (film: Film) => {
+    const favoriteFilms = JSON.parse(localStorage.getItem('favoriteFilms') || '[]');
+    const isFavorite = favoriteFilms.some((favoriteFilm: Film) => favoriteFilm.episode_id === film.episode_id);
+  
+    return (
+      <Button
+        variant="outlined"
+        color={isFavorite ? "secondary" : "primary"}
+        onClick={() => addFilmFavorite(film.episode_id)}
+      >
+        {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+      </Button>
+    );
+  };
+
+
     return (
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <Toolbar />
         <Typography variant="h4" gutterBottom>
           {film.title}
         </Typography>
-        <Fab
-        color={isPressed ? 'secondary' : 'primary'} 
-        aria-label="add"
-        onClick={handleButtonClick}
-      >
-        <AddIcon />
-      </Fab>
+        {renderAddFavoriteButton(film)}
         <Typography variant="subtitle1" gutterBottom>
           Episode {film.episode_id}
         </Typography>
