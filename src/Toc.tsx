@@ -8,9 +8,10 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-
-import { Skeleton, Typography } from '@mui/material';
+import { Skeleton} from '@mui/material';
 import { fetchFilms } from './api/data';
+
+
 
 const drawerWidth = 210;
 
@@ -21,41 +22,54 @@ interface TocProps {
 
 export default function Toc(props: TocProps) {
   
+  
   const [isLoading, setIsLoading] = React.useState(true);
-
+  const [favoriteStatus, setFavoriteStatus] = React.useState({});
+  
   React.useEffect(() => {
-    const cachedFilms = localStorage.getItem('films');
-    if (cachedFilms?.length) {
+    if (localStorage.getItem('films')) {
       setIsLoading(false);
       return;
     }
-   
-    fetchFilms()
-      .then(filmsData => {
-        localStorage.setItem('films', JSON.stringify(filmsData));
-
-        setIsLoading(false);
-      })
-      .catch(error => {
-        console.error('Error fetching films:', error);
-        setIsLoading(false);
-      });
+    fetchFilms().then((data) => {
+      localStorage.setItem('films', JSON.stringify(data));
+      setIsLoading(false);
+    });
   }, []);
 
 
-
- 
   const handleMovieClick = (film: Film) => {
     props.onMovieClick(film);
   };
 
+  const isFavorite = (film: Film) => {
+    const favoriteFilms = JSON.parse(localStorage.getItem('favoriteFilms') || '[]');
+    return favoriteFilms.some((favoriteFilm: Film) => favoriteFilm.episode_id === film.episode_id);
+  };
+
+
+
+  // ...
 
   const renderFilms = () => {
     const data = JSON.parse(localStorage.getItem('films') || '{}')
     return data?.map((film: Film, index: number) => (
-      <ListItem key={index} disablePadding>
-        <ListItemButton onClick={() => handleMovieClick(film)}>
-          <ListItemText primary={film.title} />
+      <ListItem  sx={{
+        
+      }}
+      key={index} disablePadding>
+        <ListItemButton
+          onClick={() => handleMovieClick(film)}
+          sx={{
+            background: isFavorite(film)
+              ? '#b5e7a0'
+              : '#d5e1df',
+            borderRadius: '10px',
+            borderColor: 'white',
+            borderStyle: 'solid',
+          }}
+        >
+          <ListItemText primary={film.title} />  
         </ListItemButton>
       </ListItem>
     ));
@@ -82,7 +96,7 @@ export default function Toc(props: TocProps) {
     >
       <Toolbar />
       <Box sx={{ overflow: 'auto' }}>
-        <List>
+        <List> 
           {isLoading ? renderFilmsLoading() : renderFilms()}
         </List>
       </Box>

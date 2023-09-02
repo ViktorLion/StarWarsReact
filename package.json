@@ -13,7 +13,8 @@
     "jest-environment-jsdom": "^29.6.4",
     "react": "latest",
     "react-dom": "latest",
-    "react-scripts": "latest"
+    "react-scripts": "latest",
+    "styled-components": "^6.0.7"
   },
   "devDependencies": {
     "@testing-library/react": "^14.0.0",

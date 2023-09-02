@@ -1,17 +1,34 @@
-export async function fetchAllCharacterData(): Promise<People[]> {
-    let allCharacters: People[] = [];
-    let nextPage = 'https://swapi.dev/api/people/';
-  
+export async function fetchFilms(): Promise<Films[]> {
+   let allFilms: Films[] = [];
+    let nextPage = 'https://swapi.dev/api/films/';
+
     while (nextPage) {
-      const response = await fetch(nextPage);
-      const data = await response.json();
-      allCharacters = allCharacters.concat(data.results);
-      nextPage = data.next;
+        const response = await fetch(nextPage);
+        const data = await response.json();
+        allFilms = allFilms.concat(data.results);
+        nextPage = data.next;
     }
-  
-    localStorage.setItem('characters', JSON.stringify(allCharacters));
-    return allCharacters;
-  }
+
+    localStorage.setItem('films', JSON.stringify(allFilms));
+    return allFilms;
+}
+    
+export async function fetchAllCharacterData(): Promise<People[]> {
+    let allPeople: People[] = [];
+    let nextPage = 'https://swapi.dev/api/people/';
+
+    while (nextPage) {
+        const response = await fetch(nextPage);
+        const data = await response.json();
+        allPeople = allPeople.concat(data.results);
+        nextPage = data.next;
+    }
+    localStorage.setItem('people', JSON.stringify(allPeople));
+    return allPeople;
+}
+
+
+
 
   export async function fetchAllPlanetData(): Promise<Planet[]> {
     let allPlanets: Planet[] = [];
@@ -73,11 +90,7 @@ export async function fetchAllVehicleData(): Promise<Vehicles[]> {
     return allVehicles;
     }
 
-export async function fetchFilms(): Promise<Film[]> {
-    const response = await fetch('https://swapi.dev/api/films/');
-    const data = await response.json();
-    return data.results;
-    }
+
 
     
 

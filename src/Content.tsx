@@ -2,21 +2,18 @@ import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 
-import AddIcon from '@mui/icons-material/Add';
 
-import { Button, Fab, ListItem, ListItemButton, Skeleton, Typography } from '@mui/material';
+import { Button,  Skeleton, Typography } from '@mui/material';
 import { fetchAllSpeciesData,  fetchAllVehicleData , fetchAllCharacterData,fetchAllPlanetData,fetchAllStarshipsData} from './api/data';
 import  BasicModal from './ModalProps';
 
-
-const drawerWidth = 240;
 
 interface ContentProps {
   selectedMovie: Film | null; 
 }
 export default function ClippedDrawer(props: ContentProps) {
   
-
+  const [films, setFilms] = useState<Film[] | null>(null);
   const [vehiclesData, setVehiclesData] = useState<Vehicles[]>([]);
   const [characterData, setCharacterData] = useState<People[]>([]);
   const [planetData, setPlanetData] = useState<Planet[]>([]);
@@ -32,16 +29,17 @@ export default function ClippedDrawer(props: ContentProps) {
   
   const [isModalOpen, setIsModalOpen] = useState<'people' | 'planets' | 'starships' | 'species' | 'vehicles'>();
 
-  const [favoriteFilms, setFavoriteFilms] = useState<Film[]>([]);
+  const [favoriteFilms, setFavoriteFilms] = useState<Boolean>(false);
 
   React.useEffect(() => {
+    const films = localStorage.getItem('films');
     const cachedVehicles = localStorage.getItem('vehicles');
     const cachedSpecies = localStorage.getItem('species');
     const cachedCharacters = localStorage.getItem('characters');
     const cachedPlanets = localStorage.getItem('planets');
     const cachedStarships = localStorage.getItem('starships');
   
-    if (cachedVehicles && cachedSpecies && cachedCharacters && cachedPlanets && cachedStarships) {
+    if (cachedVehicles && cachedSpecies && cachedCharacters && cachedPlanets && cachedStarships && films) {
       setIsLoading(false);
     } else {
       Promise.all([
@@ -130,23 +128,16 @@ export default function ClippedDrawer(props: ContentProps) {
     }
 
 
- }, [props.selectedMovie]);
+ }, [props.selectedMovie,favoriteFilms]);
 
 
   const renderFilmData = () => {
 
-    const data = JSON.parse(localStorage.getItem('films') || '{}')
+   const data = JSON.parse(localStorage.getItem('films') || '{}')
     
-    const film = props.selectedMovie  
+    const film = props.selectedMovie?  props.selectedMovie : data?.[0];
 
-    if(!isLoading && !film) {
-      data.map((item: Film) => {
-        if(item.episode_id === 4) {
-          return item
-        }
-      })
-    }
-      
+  
 
     if (!film) {
 
@@ -161,7 +152,11 @@ export default function ClippedDrawer(props: ContentProps) {
     return (
       <>
         {data.map((item) => (
-          <button
+          <Button variant="outlined"  
+          sx={{
+            fontSize: '12px',
+            margin: '2px', 
+          }}
             key={item.url}
             onClick={() => {
               setSelectedCharacter(item);
@@ -169,7 +164,7 @@ export default function ClippedDrawer(props: ContentProps) {
             }}
           >
             {item.name}
-          </button>
+          </Button>
         ))}
         {isModalOpen && selectedCharacter && (
           <BasicModal
@@ -201,7 +196,11 @@ export default function ClippedDrawer(props: ContentProps) {
     return (
       <>
         {data.map((planet) => (
-          <button
+          <Button variant="outlined"  
+          sx={{
+            fontSize: '12px',
+            margin: '2px', 
+          }}
             key={planet.url}
             onClick={() => {
               setSelectedPlanet(planet);
@@ -209,7 +208,7 @@ export default function ClippedDrawer(props: ContentProps) {
             }}
           >
             {planet.name}
-          </button>
+          </Button>
         ))}
         {isModalOpen && selectedPlanet && (
           <BasicModal
@@ -239,10 +238,15 @@ export default function ClippedDrawer(props: ContentProps) {
       return <Skeleton variant="rectangular" width={500} height={100} />;
     }
   
+  
     return (
       <>
         {data.map((item) => (
-          <button
+          <Button variant="outlined"  
+          sx={{
+            fontSize: '12px',
+            margin: '2px', 
+          }}
             key={item.url}
             onClick={() => {
               setSelectedStarships(item);
@@ -250,7 +254,7 @@ export default function ClippedDrawer(props: ContentProps) {
             }}
           >
             {item.name}
-          </button>
+          </Button>
         ))}
         {isModalOpen && selectedStarships && (
           <BasicModal
@@ -288,7 +292,11 @@ export default function ClippedDrawer(props: ContentProps) {
     return (
       <>
         {data.map((item) => (
-          <button
+          <Button variant="outlined"  
+          sx={{
+            fontSize: '12px',
+            margin: '2px', 
+          }}
             key={item.url}
             onClick={() => {
               setSelectedVehicles(item);
@@ -296,7 +304,7 @@ export default function ClippedDrawer(props: ContentProps) {
             }}
           >
             {item.name}
-          </button>
+          </Button>
         ))}
         {isModalOpen && selectedVehicles && (
           <BasicModal
@@ -332,7 +340,11 @@ export default function ClippedDrawer(props: ContentProps) {
     return (
       <>
         {data.map((item) => (
-          <button
+          <Button variant="outlined"  
+          sx={{
+            fontSize: '12px',
+            margin: '2px', 
+          }}
             key={item.url}
             onClick={() => {
               setSelectedSpecies(item);
@@ -340,7 +352,7 @@ export default function ClippedDrawer(props: ContentProps) {
             }}
           >
             {item.name}
-          </button>
+          </Button>
         ))}
         {isModalOpen && selectedSpecies && (
           <BasicModal
@@ -396,7 +408,8 @@ export default function ClippedDrawer(props: ContentProps) {
       >
         {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
       </Button>
-    );
+    ) 
+    ;
   };
 
 
@@ -408,7 +421,7 @@ export default function ClippedDrawer(props: ContentProps) {
         </Typography>
         {renderAddFavoriteButton(film)}
         <Typography variant="subtitle1" gutterBottom>
-          Episode {film.episode_id}
+          Episode: {film.episode_id}
         </Typography>
         <Typography variant="body1" gutterBottom>
           Director: {film.director}
@@ -425,24 +438,24 @@ export default function ClippedDrawer(props: ContentProps) {
           </Typography>
           <Typography variant="body1">{film.opening_crawl}</Typography>
         </div>
-        <Typography variant="h6" gutterBottom>
+        <Typography variant="h6" gutterBottom paragraph > 
           Characters:
           {renderCharactersData(characterData)}
         </Typography>
         <Typography variant="h6" gutterBottom>
-          Planets
+          Planets:
           {renderPlanetData(planetData)}
         </Typography>
         <Typography variant="h6" gutterBottom>
-          Starships
+          Starships:
           {renderStarshipsData(starshipsData)}
         </Typography> 
         <Typography variant="h6" gutterBottom>
-          Vehicles
+          Vehicles:
           {renderVehiclesData(vehiclesData)}
         </Typography>
         <Typography variant="h6" gutterBottom>
-          Species
+          Species:
           {renderSpeciesData(speciesData)}
         </Typography>
 
