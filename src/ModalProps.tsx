@@ -1,16 +1,17 @@
-
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import React, { ReactNode } from 'react';
 
+// Define props interface for ModalProps
 interface ModalProps {
-    children: ReactNode
-    isOpen: boolean;
-    title: string;
-    handleClose: () => void;
-  }
+  children: ReactNode; // Child elements to be displayed inside the modal
+  isOpen: boolean; //
+  title: string; //
+  handleClose: () => void; // Function to handle modal close
+}
 
+// Style configuration for the modal
 const style = {
   position: 'absolute' as 'absolute',
   top: '50%',
@@ -23,34 +24,25 @@ const style = {
   p: 4,
 };
 
+// ModalProps component
 export default function ModalProps(props: ModalProps) {
   const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
+  
   
 
   return (
     <Modal
-      open={props.isOpen}
-      onClose={props.handleClose}
+      open={props.isOpen} // Modal open state controlled by parent component
+      onClose={props.handleClose} // Modal close handler passed from parent component
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
       <Box sx={style}>
         <Typography id="modal-modal-title" variant="h6" component="h2">
-          {props.title}
+          {props.title} {/* Modal title */}
         </Typography>
-        {props.children}
+        {props.children} {/* Display the child elements within the modal */}
       </Box>
     </Modal>
   );
-    
 }
-
-
-  
-  
-  
-  
-  

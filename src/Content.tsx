@@ -2,47 +2,55 @@ import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 
-
-import { Button,  Skeleton, Typography } from '@mui/material';
-import { fetchAllSpeciesData,  fetchAllVehicleData , fetchAllCharacterData,fetchAllPlanetData,fetchAllStarshipsData} from './api/data';
+import { Button, Skeleton, Typography } from '@mui/material';
+import { fetchAllSpeciesData, fetchAllVehicleData, fetchAllCharacterData, fetchAllPlanetData, fetchAllStarshipsData } from './api/data';
 import ModalProps from './ModalProps';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 
-
 interface ContentProps {
-  selectedMovie: Film | null; 
+  selectedMovie: Film | null;
   favoriteFilms: Film[];
   addFilmFavorite: (film: Film) => void;
 }
+
 export default function ClippedDrawer(props: ContentProps) {
-  
-  
+
   const [vehiclesData, setVehiclesData] = useState<Vehicles[]>([]);
   const [characterData, setCharacterData] = useState<Characters[]>([]);
   const [planetData, setPlanetData] = useState<Planet[]>([]);
   const [starshipsData, setStarshipsData] = useState<Starships[]>([]);
   const [speciesData, setSpeciesData] = useState<Species[]>([]);
+
+  // State variables to track selected items
   const [selectedCharacter, setSelectedCharacter] = useState<Characters | null>(null);
   const [selectedPlanet, setSelectedPlanet] = useState<Planet | null>(null);
   const [selectedStarships, setSelectedStarships] = useState<Starships | null>(null);
   const [selectedVehicles, setSelectedVehicles] = useState<Vehicles | null>(null);
   const [selectedSpecies, setSelectedSpecies] = useState<Species | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState<'people' | 'planets' | 'starships' | 'species' | 'vehicles'>();
-  const [isFavorite, setIsFavorite] = useState(false);
-  
-  const data = JSON.parse(localStorage.getItem('films') || '{}')
-  let film = props.selectedMovie
 
-  if(data && !film) {
-    film = data[0]
+
+  const [isLoading, setIsLoading] = useState(true);
+
+
+  const [isModalOpen, setIsModalOpen] = useState<'people' | 'planets' | 'starships' | 'species' | 'vehicles'>();
+
+  // State to check if the selected movie is a favorite
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  // Fetch the films data from local storage and set the favorite status
+  const data = JSON.parse(localStorage.getItem('films') || '{}');
+  let film = props.selectedMovie;
+
+  if (data && !film) {
+    film = data[0];
   }
-  
+
   useEffect(() => {
-    setIsFavorite(props.favoriteFilms.some((favoriteFilm: Film) => favoriteFilm.episode_id === film?.episode_id))
+    setIsFavorite(props.favoriteFilms.some((favoriteFilm: Film) => favoriteFilm.episode_id === film?.episode_id));
   }, [props.favoriteFilms, film]);
 
+  // Fetch initial data if not cached in local storage
   React.useEffect(() => {
     const films = localStorage.getItem('films');
     const cachedVehicles = localStorage.getItem('vehicles');
@@ -50,7 +58,7 @@ export default function ClippedDrawer(props: ContentProps) {
     const cachedCharacters = localStorage.getItem('characters');
     const cachedPlanets = localStorage.getItem('planets');
     const cachedStarships = localStorage.getItem('starships');
-  
+
     if (cachedVehicles && cachedSpecies && cachedCharacters && cachedPlanets && cachedStarships && films) {
       setIsLoading(false);
     } else {
@@ -76,73 +84,64 @@ export default function ClippedDrawer(props: ContentProps) {
     }
   }, []);
 
+  // Fetch and set specific data for the selected movie
   useEffect(() => {
     const movie = props.selectedMovie || film;
 
     if (movie) {
       setIsLoading(true);
-      const veichlesdata = JSON.parse(localStorage.getItem("vehicles") || '{}')
-      const speciesdata = JSON.parse(localStorage.getItem("species") || '{}')
+
+      // Fetch cached data from local storage
+      const veichlesdata = JSON.parse(localStorage.getItem("vehicles") || '{}');
+      const speciesdata = JSON.parse(localStorage.getItem("species") || '{}');
       const characterdata = JSON.parse(localStorage.getItem("characters") || '[]');
-      const planetdata = JSON.parse(localStorage.getItem("planets") || '{}')
-      const starshipsdata = JSON.parse(localStorage.getItem("starships") || '{}')
+      const planetdata = JSON.parse(localStorage.getItem("planets") || '{}');
+      const starshipsdata = JSON.parse(localStorage.getItem("starships") || '{}');
 
-
+      // Filter and set data for selected movie
       const matchingVehicles = movie?.vehicles.filter((selectedVehicleUrl) => {
-        return veichlesdata.some((vehicleData : Vehicles) => vehicleData.url === selectedVehicleUrl);
+        return veichlesdata.some((vehicleData: Vehicles) => vehicleData.url === selectedVehicleUrl);
       });
       const selectedVeichelsData = veichlesdata.filter((vehicleData: Vehicles) => {
         return matchingVehicles?.includes(vehicleData.url);
       });
       setVehiclesData(selectedVeichelsData);
-      
+
       const matchingSpecies = movie?.species.filter((selectedSpeciesUrl) => {
-        return speciesdata.some((speciesData : Species) => speciesData.url === selectedSpeciesUrl);
-      }
-      );
+        return speciesdata.some((speciesData: Species) => speciesData.url === selectedSpeciesUrl);
+      });
       const selectedSpeciesData = speciesdata.filter((speciesData: Species) => {
         return matchingSpecies?.includes(speciesData.url);
-      }
-      );
+      });
       setSpeciesData(selectedSpeciesData);
 
       const matchingCharacter = movie?.characters.filter((selectedCharacterUrl) => {
-        return characterdata.some((characterData : Characters) => characterData.url === selectedCharacterUrl);
-      }
-      );
+        return characterdata.some((characterData: Characters) => characterData.url === selectedCharacterUrl);
+      });
       const selectedCharacterData = characterdata.filter((characterData: Characters) => {
         return matchingCharacter?.includes(characterData.url);
-      }
-      );
+      });
       setCharacterData(selectedCharacterData);
 
       const matchingPlanet = movie?.planets.filter((selectedPlanetUrl) => {
-        return planetdata.some((planetData : Planet) => planetData.url === selectedPlanetUrl);
-      }
-      );
-
+        return planetdata.some((planetData: Planet) => planetData.url === selectedPlanetUrl);
+      });
       const selectedPlanetData = planetdata.filter((planetData: Planet) => {
         return matchingPlanet?.includes(planetData.url);
-      }
-      );
+      });
       setPlanetData(selectedPlanetData);
 
       const matchingStarships = movie?.starships.filter((selectedStarshipsUrl) => {
-        return starshipsdata.some((starshipsData : Starships) => starshipsData.url === selectedStarshipsUrl);
-      }
-      );
+        return starshipsdata.some((starshipsData: Starships) => starshipsData.url === selectedStarshipsUrl);
+      });
       const selectedStarshipsData = starshipsdata.filter((starshipsData: Starships) => {
         return matchingStarships?.includes(starshipsData.url);
-      }
-      );
-
+      });
       setStarshipsData(selectedStarshipsData);
-      
+
       setIsLoading(false);
     }
-
-
- }, [props.selectedMovie, props.favoriteFilms]);
+  }, [props.selectedMovie, props.favoriteFilms]);
 
 
   const renderFilmData = () => {
