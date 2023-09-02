@@ -9,9 +9,5 @@ interface Species {
     average_lifespan: string;
     homeworld: string;
     language: string;
-    people: string[];
-    films: string[];
-    created: string;
-    edited: string;
     url: string;
 }

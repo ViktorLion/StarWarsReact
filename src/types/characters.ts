@@ -1,4 +1,4 @@
-interface People {
+interface Characters {
     name: string;
     height: string;
     mass: string;
@@ -8,12 +8,6 @@ interface People {
     birth_year: string;
     gender: string;
     homeworld: string;
-    films: string[];
-    species: string[];
-    vehicles: string[];
-    starships: string[];
-    created: string;
-    edited: string;
     url: string;
 }
     

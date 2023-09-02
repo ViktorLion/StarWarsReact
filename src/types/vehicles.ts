@@ -10,10 +10,6 @@ interface Vehicles {
     cargo_capacity: string;
     consumables: string;
     vehicle_class: string;
-    pilots: string[];
-    films: string[];
-    created: string;
-    edited: string;
     url: string;
 }
 

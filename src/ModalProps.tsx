@@ -1,11 +1,10 @@
 
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import React, { ReactNode } from 'react';
 
-interface BasicModalProps {
+interface ModalProps {
     children: ReactNode
     isOpen: boolean;
     title: string;
@@ -24,7 +23,7 @@ const style = {
   p: 4,
 };
 
-export default function BasicModal(props: BasicModalProps) {
+export default function ModalProps(props: ModalProps) {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);

@@ -10,10 +10,11 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { Skeleton} from '@mui/material';
 import { fetchFilms } from './api/data';
+import StarIcon from '@mui/icons-material/Star';
 
 
 
-const drawerWidth = 210;
+const drawerWidth = 250;
 
 interface TocProps {
   onMovieClick: (film: Film) => void; 
@@ -24,7 +25,8 @@ export default function Toc(props: TocProps) {
   
   
   const [isLoading, setIsLoading] = React.useState(true);
-  const [favoriteStatus, setFavoriteStatus] = React.useState({});
+  
+
   
   React.useEffect(() => {
     if (localStorage.getItem('films')) {
@@ -42,34 +44,29 @@ export default function Toc(props: TocProps) {
     props.onMovieClick(film);
   };
 
-  const isFavorite = (film: Film) => {
+  const isFavoriteFilm = (film: Film) => {
     const favoriteFilms = JSON.parse(localStorage.getItem('favoriteFilms') || '[]');
-    return favoriteFilms.some((favoriteFilm: Film) => favoriteFilm.episode_id === film.episode_id);
+    console.log(favoriteFilms);
+   
+    return favoriteFilms?.some((favoriteFilm: Film) => favoriteFilm.episode_id === film.episode_id);
+    
   };
 
-
-
-  // ...
 
   const renderFilms = () => {
     const data = JSON.parse(localStorage.getItem('films') || '{}')
     return data?.map((film: Film, index: number) => (
       <ListItem  sx={{
+         merginBottom: '10px',
         
       }}
       key={index} disablePadding>
         <ListItemButton
           onClick={() => handleMovieClick(film)}
-          sx={{
-            background: isFavorite(film)
-              ? '#b5e7a0'
-              : '#d5e1df',
-            borderRadius: '10px',
-            borderColor: 'white',
-            borderStyle: 'solid',
-          }}
         >
-          <ListItemText primary={film.title} />  
+          <ListItemText primary={film.title} />
+          {isFavoriteFilm(film) ? <StarIcon 
+          color={"secondary" }/> : null}  
         </ListItemButton>
       </ListItem>
     ));

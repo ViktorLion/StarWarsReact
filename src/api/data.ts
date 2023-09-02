@@ -13,8 +13,8 @@ export async function fetchFilms(): Promise<Films[]> {
     return allFilms;
 }
     
-export async function fetchAllCharacterData(): Promise<People[]> {
-    let allPeople: People[] = [];
+export async function fetchAllCharacterData(): Promise<Characters[]> {
+    let allPeople: Characters[] = [];
     let nextPage = 'https://swapi.dev/api/people/';
 
     while (nextPage) {
@@ -23,7 +23,7 @@ export async function fetchAllCharacterData(): Promise<People[]> {
         allPeople = allPeople.concat(data.results);
         nextPage = data.next;
     }
-    localStorage.setItem('people', JSON.stringify(allPeople));
+    localStorage.setItem('characters', JSON.stringify(allPeople));
     return allPeople;
 }
 
