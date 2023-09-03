@@ -9,6 +9,7 @@ import ListItemText from '@mui/material/ListItemText';
 import { Skeleton } from '@mui/material';
 import { fetchFilms } from './api/data';
 import StarIcon from '@mui/icons-material/Star';
+import useScreenWidth from './hooks/useScreenWidth';
 
 const drawerWidth = 250;
 
@@ -17,6 +18,9 @@ interface TocProps {
 }
 
 export default function Toc(props: TocProps) {
+  const widthSize = useScreenWidth()
+  const mobileWidth = widthSize <= 500
+
   // State to track loading status
   const [isLoading, setIsLoading] = React.useState(true);
 
@@ -78,9 +82,9 @@ export default function Toc(props: TocProps) {
     <Drawer
       variant="permanent"
       sx={{
-        width: drawerWidth,
+        width: mobileWidth ? 100 : drawerWidth,
         flexShrink: 0,
-        [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
+        [`& .MuiDrawer-paper`]: { width: mobileWidth ? 100 : drawerWidth, boxSizing: 'border-box' },
       }}
     >
       <Toolbar />

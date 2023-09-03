@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 
-import { Button, Skeleton, Typography } from '@mui/material';
+import { Button, Card, Grid, Skeleton, Typography } from '@mui/material';
 import { fetchAllSpeciesData, fetchAllVehicleData, fetchAllCharacterData, fetchAllPlanetData, fetchAllStarshipsData } from './api/data';
-import ModalProps from './ModalProps';
+import ModalProps from './Modal';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
+import { ContentLoading } from './ContentLoading';
+import { renderMoviePoster } from './filmIcons';
 
 interface ContentProps {
   selectedMovie: Film | null;
@@ -14,7 +16,7 @@ interface ContentProps {
   addFilmFavorite: (film: Film) => void;
 }
 
-export default function ClippedDrawer(props: ContentProps) {
+export default function Content(props: ContentProps) {
 
   const [vehiclesData, setVehiclesData] = useState<Vehicles[]>([]);
   const [characterData, setCharacterData] = useState<Characters[]>([]);
@@ -143,14 +145,6 @@ export default function ClippedDrawer(props: ContentProps) {
     }
   }, [props.selectedMovie, props.favoriteFilms]);
 
-
-  const renderFilmData = () => {
-
-    if (!film) {
-
-      return <Skeleton variant="rectangular" width={500} height={200} />;
-    }
-
   const renderCharactersData = (data: Characters[]) => {
     if (isLoading) {
       return <Skeleton variant="rectangular" width={500} height={100} />;
@@ -239,7 +233,6 @@ export default function ClippedDrawer(props: ContentProps) {
       return <Skeleton variant="rectangular" width={500} height={100} />;
     }
   
-  
     return (
       <>
         {data.map((item) => (
@@ -263,7 +256,6 @@ export default function ClippedDrawer(props: ContentProps) {
             isOpen={isModalOpen === 'starships'}
             handleClose={() => setIsModalOpen(undefined)}
           >
-            <p>Name: {selectedStarships.name}</p>
             <p>Model: {selectedStarships.model}</p>
             <p>Manufacturer: {selectedStarships.manufacturer}</p>
             <p>Cost in Credits: {selectedStarships.cost_in_credits}</p>
@@ -284,7 +276,6 @@ export default function ClippedDrawer(props: ContentProps) {
 
   const renderVehiclesData = (data: Vehicles[]) => {
     if (isLoading) {
-
       return <Skeleton variant="rectangular" width={500} height={200} />;
     }
   
@@ -311,7 +302,6 @@ export default function ClippedDrawer(props: ContentProps) {
             isOpen={isModalOpen===  'vehicles'}
             handleClose={() => setIsModalOpen(undefined)}
           >
-            <p>Name: {selectedVehicles.name}</p>
             <p>Model: {selectedVehicles.model}</p>
             <p>Manufacturer: {selectedVehicles.manufacturer}</p>
             <p>Cost in Credits: {selectedVehicles.cost_in_credits}</p>
@@ -357,7 +347,6 @@ export default function ClippedDrawer(props: ContentProps) {
             isOpen={isModalOpen === 'species'}
             handleClose={() => setIsModalOpen(undefined)}
           >
-            <p>Name: {selectedSpecies.name}</p>
             <p>Classification: {selectedSpecies.classification}</p>
             <p>Designation: {selectedSpecies.designation}</p>
             <p>Average Height: {selectedSpecies.average_height}</p>
@@ -373,7 +362,6 @@ export default function ClippedDrawer(props: ContentProps) {
   };
 
   const renderAddFavoriteButton = (film: Film) => {
-
     return (
       <Button  size="small" 
         variant="outlined"
@@ -387,58 +375,82 @@ export default function ClippedDrawer(props: ContentProps) {
   };
 
 
+  const renderFilmData = () => {
+    if (!film) {
+      return <ContentLoading />
+    }
+
+
     return (
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        <Toolbar />
-        <Typography variant="h4" gutterBottom>
-        {film.title} {renderAddFavoriteButton(film)}
-        </Typography>
-        <Typography variant="subtitle1" gutterBottom>
-          Episode: {film.episode_id}
-        </Typography>
-        <Typography variant="body1" gutterBottom>
-          Director: {film.director}
-        </Typography>
-        <Typography variant="body1" gutterBottom>
-          Producer: {film.producer}
-        </Typography>
-        <Typography variant="body1" gutterBottom>
-          Release Date: {film.release_date}
-        </Typography>
+      <Box component="main" sx={{  merginRight: 50 , flexGrow: 1, p: 3, mt: 2 }}>
+        <Card sx={{p: 2, mb: 2, mt: 2}}>
+          <Grid container xs={12}>
+            <Grid item md={3} xs={12}>
+              {renderMoviePoster(film.title)}
+            </Grid>
+            <Grid item md={6} xs={12}>
+                <Typography variant="h4" gutterBottom>
+                {film.title} {renderAddFavoriteButton(film)}
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                  Episode: {film.episode_id}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  Director: {film.director}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  Producer: {film.producer}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  Release Date: {film.release_date}
+                </Typography>
+            </Grid>
+          </Grid>
+        </Card>
+        <Card sx={{p: 2, mb: 2, mt: 2}}>
         <div className="opening-crawl">
           <Typography variant="h6" gutterBottom>
             Opening Crawl:
           </Typography>
           <Typography variant="body1">{film.opening_crawl}</Typography>
         </div>
-        <Typography variant="h6" gutterBottom paragraph > 
-          Characters:
-          {renderCharactersData(characterData)}
-        </Typography>
-        <Typography variant="h6" gutterBottom>
-          Planets:
+        </Card>
+        <Card sx={{p: 2, mb: 2, mt: 2}}>
+          <Typography variant="h6" gutterBottom paragraph > 
+            Characters:
+          </Typography>
+        {renderCharactersData(characterData)}
+        </Card>
+        <Card sx={{p: 2, mb: 2, mt: 2}}>
+          <Typography variant="h6" gutterBottom>
+            Planets:
+          </Typography>
           {renderPlanetData(planetData)}
-        </Typography>
-        <Typography variant="h6" gutterBottom>
-          Starships:
+        </Card>
+        <Card sx={{p: 2, mb: 2, mt: 2}}>
+          <Typography variant="h6" gutterBottom>
+            Starships:
+          </Typography> 
           {renderStarshipsData(starshipsData)}
-        </Typography> 
-        <Typography variant="h6" gutterBottom>
-          Vehicles:
+        </Card>
+        <Card sx={{p: 2, mb: 2, mt: 2}}>
+          <Typography variant="h6" gutterBottom>
+            Vehicles:
+          </Typography>
           {renderVehiclesData(vehiclesData)}
-        </Typography>
-        <Typography variant="h6" gutterBottom>
-          Species:
+        </Card>
+        <Card sx={{p: 2, mb: 2, mt: 2}}>
+          <Typography variant="h6" gutterBottom>
+            Species:
+          </Typography>
           {renderSpeciesData(speciesData)}
-        </Typography>
-
+        </Card>
   </Box>
 );
   };
   
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-      <Toolbar />
       {renderFilmData()}
     </Box>
   );
