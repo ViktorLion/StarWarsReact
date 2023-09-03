@@ -16,7 +16,7 @@ A web application that allows users to explore information about Star Wars movie
 
 ## Introduction
 
-The Star Wars Movie Viewer is a React-based web application that fetches data from the [SWAPI (Star Wars API)](https://swapi.dev/) and presents it in an interactive and user-friendly way. Users can select a Star Wars movie from the list, view details about the movie, explore related information amd add film to favorite
+The Star Wars Movie Viewer is a React-based web application that fetches data from the [SWAPI (Star Wars API)](https://swapi.dev/) and presents it in an interactive and user-friendly way. Users can select a Star Wars movie from the list, view details about the movie, explore related information, and add films to favorites
 
 ## Features
 
@@ -30,7 +30,7 @@ The Star Wars Movie Viewer is a React-based web application that fetches data fr
 
 ## Technologies
 
-- React: A Typecript library .
+- React: A Typecript library.
 - Material-UI: React UI framework 
 - SWAPI (Star Wars API): Data for Star Wars movies, characters, planets, starships, vehicles, and species.
 
@@ -51,8 +51,6 @@ npm start
 
 
 https://github.com/ViktorLion/ZoominExam/assets/70378430/bc227ec0-e439-46e8-8b46-4c818127c6d5
-
-
 
 
 
