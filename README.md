@@ -9,6 +9,7 @@ A web application that allows users to explore information about Star Wars movie
 - [Features](#features)
 - [Technologies](#technologies)
 - [Setup](#setup)
+- [Demo](#demo)
 - [Usage](#usage)
 - [Contributing](#contributing)
 
@@ -46,13 +47,18 @@ npm i @emotion/react
 3. Start the development server
 npm start
 
+## Demo
+
+
+https://github.com/ViktorLion/ZoominExam/assets/70378430/bc227ec0-e439-46e8-8b46-4c818127c6d5
+
 
 
 
 
 ## Usage
 
-Wait for all data to be Cashed
+Wait for all data to be Cashed 
 Select a Star Wars movie from the list to view its details.
 Explore the characters, planets, starships, vehicles, and species associated with the selected movie.
 Add your favorite movies to your list of favorites by clicking the "Add to Favorites" button.
